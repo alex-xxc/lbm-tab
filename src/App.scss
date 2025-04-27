@@ -1,0 +1,30 @@
+#root, .#{$app-prefix} {
+  width: 100%;
+  height: 100%;
+}
+.#{$app-prefix}-layout{
+  height: 100%;
+  .ant-layout-sider-zero-width-trigger-right,.ant-layout-sider-zero-width-trigger-left{
+    width: 16px !important;
+    font-size: 16px;
+    top: 80px;
+  }
+  .ant-layout-sider-zero-width-trigger-right{
+    inset-inline-start: -16px
+  }
+  .ant-layout-sider-zero-width-trigger-left{
+    inset-inline-end: -16px
+  }
+  &-left-sider{
+    border-right: 1px solid #f7f7f7;
+  }
+  &-right-sider{
+    border-left: 1px solid #f7f7f7;
+  }
+}
+.#{$app-prefix}-night {
+  .ant-layout-sider-zero-width-trigger-right,.ant-layout-sider-zero-width-trigger-left{
+    background-color: #ffffff;
+    color: #111;
+  }
+}

@@ -1,0 +1,53 @@
+.#{$app-prefix}-header{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-content: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  &-right{
+    display: flex;
+    align-items: center;
+    gap: 0 16px;
+    &-item{
+      cursor: pointer;
+      &>span:last-child{
+        margin-left: 8px;
+      }
+    }
+  }
+  &-left{
+    display: flex;
+    align-items: center;
+    &-logo{
+      display: block;
+      width: 32px;
+      height: 32px;
+      background: url("../images/apple-touch-icon.png");
+      background-size: cover;
+      margin-right: 8px;
+    }
+    &-title{
+      font-weight: bold;
+    }
+  }
+}
+.#{$app-prefix}-setting{
+  &-content{
+    border: 1px solid #ddd;
+    &>.ant-row{
+      height: 40px;
+      line-height: 40px;
+      border-top: 1px solid #ddd;
+      &:first-of-type{
+        border-top: none;
+      }
+      &>.ant-col{
+        padding: 0 16px;
+        &:first-of-type{
+          border-right: 1px solid #ddd;
+        }
+      }
+    }
+  }
+}

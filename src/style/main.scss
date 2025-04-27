@@ -1,0 +1,63 @@
+.#{$app-prefix}-main{
+  height: 100%;
+  &-header{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid #e8e8e8;
+  }
+  &-content{
+    height: calc(100% - 50px);
+    overflow: auto;
+    &>.ant-collapse{
+      border: none;
+      .ant-collapse-content{
+        border-top: none;
+      }
+      .ant-collapse-content-box{
+        padding: 0;
+      }
+    }
+  }
+  &-page{
+    padding: 14px;
+    border: 2px dashed transparent;
+    &.is-over{
+      border-color: #1677ff;
+    }
+    &-title{
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      &-icon{
+        display: flex;
+        margin-right: 7px;
+      }
+      &-name{
+        width: calc(100% - 28px);
+        overflow: hidden;
+        white-space: nowrap;
+        word-break: break-word;
+        text-overflow: ellipsis;
+      }
+    }
+    &-item{
+      width: 208px;
+      cursor: pointer;
+      &-description{
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+    }
+    &-list{
+      .ant-list-items{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+    }
+  }
+}

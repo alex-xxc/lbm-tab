@@ -1,0 +1,58 @@
+.#{$app-prefix}-left {
+  height: 100%;
+  &-title{
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid #ccc;
+  }
+  &-content{
+    height: calc(100% - 50px);
+    &-search{
+      padding: 8px 16px;
+      height: 50px;
+    }
+  }
+  &-tree{
+    height: calc(100% - 50px);
+    overflow: auto;
+    &-item{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      &-name{
+        overflow: hidden;
+        white-space: nowrap;
+        word-break: break-word;
+        text-overflow: ellipsis;
+      }
+      &-icon{
+        display: none;
+      }
+      &:hover{
+        &>div:last-of-type{
+          display: flex;
+        }
+      }
+    }
+    .ant-tree-title{
+      width: calc(100% - 24px);
+    }
+    .ant-tree-treenode{
+      width: 100%;
+      padding-right: 16px;
+    }
+    .ant-tree-treenode .ant-tree-node-content-wrapper{
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-height: 30px;
+    }
+  }
+}
+
+.#{$app-prefix}-light .#{$app-prefix}-left{
+  color: #111;
+}
