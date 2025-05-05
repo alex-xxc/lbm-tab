@@ -26,19 +26,15 @@ const Setting: React.FC<SettingProps> = (props) => {
     }, [visible, props.visible]);
 
     const onExport = async () => {
-        const collectionData = await storage.get(storage.COLLECTIONDATA);
-        const pageData = await storage.get(storage.PAGEDATA);
-        const space = await storage.get(storage.SPACE);
-        const selectSpace = await storage.get(storage.SELECTSPACE);
-        const appTheme = await storage.get(storage.APPTHEME);
-        // 将 JSON 数据转换为字符串
-        const jsonString = JSON.stringify({
-            [storage.COLLECTIONDATA]:collectionData,
-            [storage.PAGEDATA]:pageData,
-            [storage.SPACE]:space,
-            [storage.SELECTSPACE]:selectSpace,
-            [storage.APPTHEME]:appTheme
-        }, null, 2);
+
+        const keys = await storage.keys();
+        let jsonString = '';
+        for (let i = 0; i < keys.length; i++) {
+            const data = await storage.get(keys[i]);
+            jsonString+=`,"${keys[i]}":${JSON.stringify(data)}`
+        }
+        jsonString = jsonString.substring(1);
+        jsonString="{"+jsonString+"}";
 
         // 创建一个 Blob 对象
         const blob = new Blob([jsonString], { type: 'application/json' });
@@ -66,20 +62,17 @@ const Setting: React.FC<SettingProps> = (props) => {
             const fileContent = event.target?.result;
             try {
                 const jsonObject = JSON.parse(fileContent as string);
-                if(jsonObject[storage.COLLECTIONDATA]){
-                    await storage.set(storage.COLLECTIONDATA, jsonObject[storage.COLLECTIONDATA])
-                }
-                if(jsonObject[storage.SPACE]){
-                    await storage.set(storage.SPACE, jsonObject[storage.SPACE])
-                }
-                if(jsonObject[storage.SELECTSPACE]){
-                    await storage.set(storage.SELECTSPACE, jsonObject[storage.SELECTSPACE])
-                }
-                if(jsonObject[storage.PAGEDATA]){
-                    await storage.set(storage.PAGEDATA, jsonObject[storage.PAGEDATA])
-                }
-                if(jsonObject[storage.APPTHEME]){
-                    await storage.set(storage.APPTHEME, jsonObject[storage.APPTHEME])
+                const keys = Object.keys(jsonObject);
+                const keysLength = keys.length;
+                for (let i = 0; i < keysLength; i++) {
+                    const key = keys[i];
+                    const data = jsonObject[key];
+                    if(key===storage.SPACE){
+                        const oldSpace = await storage.get(storage.SPACE)||[];
+                        await storage.set(storage.SPACE, [...oldSpace, ...data])
+                    }else{
+                        await storage.set(key, data);
+                    }
                 }
                 Modal.confirm({
                     title: '提示',

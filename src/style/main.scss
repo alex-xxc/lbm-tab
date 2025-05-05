@@ -12,6 +12,9 @@
     overflow: auto;
     &>.ant-collapse{
       border: none;
+      .ant-collapse-header{
+        border-radius: 0 !important;
+      }
       .ant-collapse-content{
         border-top: none;
       }
@@ -59,5 +62,11 @@
         gap: 16px;
       }
     }
+  }
+}
+
+.#{$app-prefix}-night{
+  .lbm-tab-main-page-item{
+    background-color: rgb(73, 73, 92);
   }
 }

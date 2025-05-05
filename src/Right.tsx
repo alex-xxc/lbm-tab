@@ -158,7 +158,6 @@ const Right:React.FC<RightPropsType> = () => {
 export default Right;
 
 const ListItem = (props)=>{
-    console.log("right",props)
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'BOX',
         item: props,

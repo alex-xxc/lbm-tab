@@ -1,5 +1,5 @@
 import {appPrefix} from "@/constants";
-import {Button, Collapse, Empty, Input, Modal} from "antd";
+import {Button, Collapse, Empty, Input, Modal, Skeleton} from "antd";
 import {
     DownOutlined,
     EditOutlined,
@@ -7,7 +7,6 @@ import {
     UpOutlined,
     PlusOutlined,
     MinusOutlined,
-    PlusCircleOutlined
 } from '@ant-design/icons';
 import '@/style/main.scss';
 import {inject, observer} from "mobx-react";
@@ -28,16 +27,21 @@ const Index: React.FC<MainContentPropsType> = (props) => {
     const [showCollectionDialog, setShowCollectionDialog] = useState(false)
     const [expandedKeys, setExpandedKeys] = useState([]);
     const [searchValue, setSearchValue] = useState('');
+    const [loading, setLoading] = useState(true);
 
     const loadCollectionData = useCallback(async () => {
-        const cacheData = await storage.get(storage.COLLECTIONDATA);
-        const collectionData = cacheData?.[spaceId] || [];
+        const collectionData = await storage.get(storage.COLLECTIONDATA,spaceId) || [];
         setExpandedKeys(collectionData.map(item=>item.id))
         setCollectionData(collectionData)
         return collectionData;
     }, [spaceId])
     useEffect(() => {
-        loadCollectionData()
+        (async ()=>{
+            if(!spaceId) return;
+            setLoading(true)
+            await loadCollectionData()
+            setLoading(false)
+        })()
     }, [spaceId]);
 
     const onAddCollection = useCallback(() => {
@@ -70,10 +74,11 @@ const Index: React.FC<MainContentPropsType> = (props) => {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: async () => {
-                    const cacheData = await storage.get(storage.COLLECTIONDATA);
-                    cacheData[spaceId] = cacheData[spaceId].filter(i=>i.id!==item.id);
-                    setCollectionData(cacheData[spaceId])
-                    await storage.set("collectionData", cacheData);
+                    let collectionData = await storage.get(storage.COLLECTIONDATA,spaceId)||[];
+                    collectionData = collectionData.filter(i=>i.id!==item.id);
+                    setCollectionData(collectionData)
+                    await storage.set([storage.COLLECTIONDATA, spaceId], collectionData);
+                    await storage.remove([storage.PAGEDATA, item.id]);
                 },
             });
         }
@@ -124,22 +129,28 @@ const Index: React.FC<MainContentPropsType> = (props) => {
             </span>
             </div>
             <div className={`${appPrefix}-main-content`} style={collectionData.length?{}:{display:'flex',justifyContent:'center',alignItems:'center'}}>
-
                 {
-                    collectionData.length ? (
-                            <Collapse items={collectionItems} activeKey={expandedKeys} onChange={setExpandedKeys}/>
-                        ) :
-                        (
-                            <Empty
-                                description={
-                                    <span>
+                    loading && <Skeleton></Skeleton>
+                }
+                {
+                    !loading && <>
+                        {
+                            collectionData.length ? (
+                                    <Collapse items={collectionItems} activeKey={expandedKeys} onChange={setExpandedKeys}/>
+                                ) :
+                                (
+                                    <Empty
+                                        description={
+                                            <span>
                                     暂无收藏集，请先创建收藏集
                                  </span>
-                                }
-                            >
-                                <Button type={'primary'} onClick={onAddCollection}>新建收藏集</Button>
-                            </Empty>
-                        )
+                                        }
+                                    >
+                                        <Button type={'primary'} onClick={onAddCollection}>新建收藏集</Button>
+                                    </Empty>
+                                )
+                        }
+                    </>
                 }
             </div>
             <CollectionDetail

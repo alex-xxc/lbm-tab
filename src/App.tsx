@@ -15,7 +15,7 @@ import {LeftOutlined, RightOutlined} from '@ant-design/icons'
 
 const {Sider, Header, Content} = Layout;
 const App: React.FC<AppPropsType> = (props) => {
-    const {selectSpace, appTheme} = props.appStore;
+    const {selectSpace, appTheme, globalLoading} = props.appStore;
     const [leftVisible, setLeftVisible] = useState(false);
     const [rightVisible, setRightVisible] = useState(false);
 
@@ -43,7 +43,7 @@ const App: React.FC<AppPropsType> = (props) => {
                             <Left/>
                         </Sider>
                         <Layout>
-                            <Header style={{padding: 0, height: '50px', borderBottom: '1px solid #ccc'}}
+                            <Header style={{padding: 0, height: '50px'}}
                             >
                                 <HeaderContent/>
                             </Header>
@@ -54,11 +54,11 @@ const App: React.FC<AppPropsType> = (props) => {
                                 height: '100%'
                             }}>
                                 {
-                                    selectSpace.length ? <MainContent/> : <Empty
+                                    (selectSpace.length||globalLoading) ? <MainContent/> : <Empty
                                         description={
                                             <span>
-                   暂无空间，请先创建空间
-                 </span>
+                                               暂无空间，请先创建空间
+                                             </span>
                                         }
                                     >
                                         <Button type={'primary'} onClick={onAddSpace}>新建工作空间</Button>

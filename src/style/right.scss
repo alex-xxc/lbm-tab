@@ -1,5 +1,6 @@
 .#{$app-prefix}-right {
   height: 100%;
+
   &-title{
     height: 50px;
     display: flex;
@@ -18,12 +19,14 @@
       height: calc(100% - 50px);
       overflow: auto;
       .ant-collapse-header{
-        background-color: #1677ff;
+        background-color: #f7f7f7;
+        border-radius: 0 !important;
+        //background-color: #1677ff;
         .ant-collapse-header-text{
-          color: #ffffff;
+          //color: #ffffff;
         }
         .ant-collapse-arrow svg{
-          color: #ffffff;
+          //color: #ffffff;
         }
       }
     }
@@ -32,6 +35,9 @@
     &-item{
       //height: 60px;
       padding: 6px 0 !important;
+      .ant-tag{
+        margin-inline-end: 0;
+      }
       &-content{
         border-radius: 8px;
         display: flex;
@@ -43,7 +49,7 @@
         border: 1px solid transparent;
         &>span{
           display: block;
-          width: calc(100% - 24px);
+          width: calc(100% - 20px);
           overflow: hidden;
           white-space: nowrap;
           word-break: break-word;
@@ -54,8 +60,8 @@
           margin-right: 4px;
         }
         &:hover,&.active{
-          background-color: #1677ff;
-          color: #ffffff;
+          //background-color: #1677ff;
+          //color: #ffffff;
         }
       }
     }
@@ -65,4 +71,18 @@
 
 .#{$app-prefix}-light .#{$app-prefix}-right{
   color: #111111;
+}
+.#{$app-prefix}-night {
+  .ant-collapse-header{
+    background-color: rgb(73, 73, 92);
+  }
+  .lbm-tab-layout-right-sider{
+    border-left-color: rgb(73, 73, 92);
+  }
+  .lbm-tab-right-title{
+    border-bottom-color: rgb(73, 73, 92);
+  }
+  .#{$app-prefix}-right .ant-tag{
+    background-color: rgb(73, 73, 92);
+  }
 }

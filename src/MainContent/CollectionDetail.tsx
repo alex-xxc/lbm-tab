@@ -11,7 +11,7 @@ const CollectionDetail:React.FC<CollectionDetailPropsType> = (props) => {
     const [spaces, setSpaces] = useState([]);
 
     const getTreeData = async ()=>{
-        const spaces = await storage.get(storage.SPACE);
+        const spaces = await storage.get(storage.SPACE)||[];
         function replaceSpaces(datas:any[]){
             datas.forEach(item=>{
                 item.key = item.id;
@@ -45,24 +45,26 @@ const CollectionDetail:React.FC<CollectionDetailPropsType> = (props) => {
             return;
         }
         const {name, space} = form.getFieldsValue();
-        const cacheData = await storage.get(storage.COLLECTIONDATA) || {};
+        let collectionData = await storage.get(storage.COLLECTIONDATA, spaceId) || [];
         if(data?.id){
             if(space===spaceId){
-                cacheData[spaceId] = cacheData[spaceId].map(item=>{
+                collectionData = collectionData.map(item=>{
                     if(item.id===data.id){
                         item.name = name;
                     }
                     return item;
                 })
             }else {
-                cacheData[spaceId] = cacheData[spaceId].filter(item=>item.id!==data.id)
-                cacheData[space] = [...(cacheData?.[space]||[]), {...data, name}]
+                collectionData = collectionData.filter(item=>item.id!==data.id)
+                let newCollectionData = await storage.get(storage.COLLECTIONDATA, space) || [];
+                newCollectionData = [...newCollectionData, {...data, name}]
+                await storage.set([storage.COLLECTIONDATA, space], newCollectionData);
             }
 
         }else {
-            cacheData[spaceId] = [...(cacheData?.[spaceId]||[]), {id:uuidV4(), name}]
+            collectionData = [...collectionData, {id:uuidV4(), name}]
         }
-        await storage.set("collectionData", cacheData);
+        await storage.set([storage.COLLECTIONDATA, spaceId], collectionData);
         props.onSave();
         onClose();
     },[spaceId, props.onSave, data])
@@ -79,7 +81,7 @@ const CollectionDetail:React.FC<CollectionDetailPropsType> = (props) => {
             onCancel={onClose}
         >
             <Form
-                name="basic"
+                name="CollectionDetail"
                 labelCol={{span: 6}}
                 wrapperCol={{span:18}}
                 style={{maxWidth: 600}}

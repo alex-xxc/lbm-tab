@@ -17,4 +17,5 @@ export interface PageDetailPropsType{
     onClose: () => void;
     onSave: () => void;
     data: anyParams;
+    appStore?: AppStoreType;
 }
