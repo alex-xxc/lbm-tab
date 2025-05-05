@@ -5,6 +5,7 @@
   align-content: center;
   justify-content: space-between;
   padding: 0 16px;
+  border-bottom: 1px solid #ccc;
   &-right{
     display: flex;
     align-items: center;
@@ -49,5 +50,11 @@
         }
       }
     }
+  }
+}
+
+.#{$app-prefix}-night{
+  .#{$app-prefix}-header{
+    border-bottom-color: rgb(73, 73, 92);
   }
 }

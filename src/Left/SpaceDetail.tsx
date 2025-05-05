@@ -21,7 +21,7 @@ const SpaceDetail:React.FC<PropsType> = (props) => {
     const oldInfo = useRef({} as anyParams);
 
     const getTreeData = async ()=>{
-        let spaces = await storage.get(storage.SPACE);
+        let spaces = await storage.get(storage.SPACE)||[];
         spaces = [
             {
                 id: '',
@@ -135,7 +135,7 @@ const SpaceDetail:React.FC<PropsType> = (props) => {
             onCancel={onClose}
         >
             <Form
-                name="basic"
+                name="SpaceDetail"
                 labelCol={{span: 6}}
                 wrapperCol={{span: 18}}
                 style={{maxWidth: 600}}

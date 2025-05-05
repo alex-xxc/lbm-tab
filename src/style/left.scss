@@ -56,3 +56,14 @@
 .#{$app-prefix}-light .#{$app-prefix}-left{
   color: #111;
 }
+.#{$app-prefix}-night .lbm-tab-layout-left-sider{
+  border-right-color: rgb(73, 73, 92);
+}
+
+.#{$app-prefix}-night .lbm-tab-left-title{
+  border-bottom-color: rgb(73, 73, 92);
+}
+
+.#{$app-prefix}-night .#{$app-prefix}-left .ant-tree-node-selected, .#{$app-prefix}-night .#{$app-prefix}-left .ant-tree-node-content-wrapper:hover {
+  background-color: rgb(73, 73, 92);
+}

@@ -51,7 +51,10 @@ const Index: React.FC<LeftPropsType> = (props) => {
             setExpandedKeys(spaceIds);
             if(existSpaceId){
                 setProperty({selectSpace:cacheSelectSpace})
+            }else {
+                setProperty({selectSpace:[spaces?.[0]?.id||'']})
             }
+            setProperty({globalLoading:false})
         })()
         eventEmitter.on("addSpace", ()=>{
             setShowAddSpace(true)
@@ -135,21 +138,19 @@ const Index: React.FC<LeftPropsType> = (props) => {
                     const newSelectSpaceId = spaces?.[0]?.id||'';
                     const newSelectSpace = newSelectSpaceId?[newSelectSpaceId]:[];
                     setProperty({selectSpace:newSelectSpace});
-                    storage.set('selectSpace', newSelectSpace)
+                    await storage.set(storage.SELECTSPACE, newSelectSpace)
                     
                 }
-                const collectionData = await storage.get(storage.COLLECTIONDATA)|| {};
-                let deleteCollectionIds = [];
-                deleteSpaceIds.forEach(item=>{
-                    deleteCollectionIds = [...deleteCollectionIds,...(collectionData[item]||[]).map(item=>item.id)];
-                    delete collectionData[item]
-                })
-                await storage.set(storage.COLLECTIONDATA, collectionData)
-                const pageData = await storage.get(storage.PAGEDATA) || {};
-                deleteCollectionIds.forEach(item=>{
-                    delete pageData[item]
-                })
-                await storage.set("PageData", pageData)
+                for (let i = 0; i < deleteSpaceIds.length; i++) {
+                    const deleteSpaceId = deleteSpaceIds[i];
+                    const collectionData = await storage.get(storage.COLLECTIONDATA, deleteSpaceId)|| [];
+                    await storage.remove([storage.COLLECTIONDATA, deleteSpaceId])
+                    const deleteCollectionIds = collectionData.map(item=>item.id);
+                    for (let j = 0; j < deleteCollectionIds; j++) {
+                        const deleteCollectionId = deleteCollectionIds[j];
+                        await storage.remove([storage.PAGEDATA, deleteCollectionId])
+                    }
+                }
             }
         })
     }

@@ -12,6 +12,7 @@ class AppStore implements AppStoreType{
 
     @observable selectSpace= [];
     @observable appTheme: AppStoreType['appTheme'] = 'light';
+    @observable globalLoading = true;
 
     @action
     setProperty=(params:anyParams)=>{

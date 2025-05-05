@@ -3,14 +3,17 @@ import React, {useCallback, useEffect, useState} from "react";
 import {Form, Input, Modal, TreeSelect} from "antd";
 import storage from "@/storage.ts";
 import {v4 as uuidV4} from "uuid";
+import {inject, observer} from "mobx-react";
+import eventEmitter from "@/utils/eventEmitter.ts";
 
 const PageDetail:React.FC<PageDetailPropsType> = (props) => {
+    const {selectSpace} = props.appStore!;
     const {data, collectionId} = props;
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false);
     const [spaces, setSpaces] = useState([]);
     const [collections, setCollections] = useState([]);
-
+    const spaceId = selectSpace?.[0]||'';
     const getTreeData = async ()=>{
         const spaces = await storage.get(storage.SPACE);
         function replaceData(datas:any[]){
@@ -25,19 +28,10 @@ const PageDetail:React.FC<PageDetailPropsType> = (props) => {
         }
         replaceData(spaces)
         setSpaces(spaces)
-        let selectSpaceId ='';
-        const collections = await storage.get(storage.COLLECTIONDATA);
-        Object.keys(collections).forEach(key=>{
-            if(!selectSpaceId && collections[key].find(item=>item.id===collectionId)){
-                selectSpaceId = key;
-                const currentCollections = collections[key];
-                replaceData(currentCollections)
-                setCollections(currentCollections)
-                form.setFieldsValue({
-                    space: selectSpaceId
-                })
-            }
-        })
+
+        const collectionData = await storage.get(storage.COLLECTIONDATA, spaceId);
+        replaceData(collectionData);
+        setCollections(collectionData);
     }
 
     useEffect(() => {
@@ -46,11 +40,12 @@ const PageDetail:React.FC<PageDetailPropsType> = (props) => {
             form.resetFields();
             form.setFieldsValue({
                 ...props.data,
-                collection: collectionId
+                collection: collectionId,
+                space: spaceId
             });
             getTreeData()
         }
-    }, [props.visible, visible, form, props.data]);
+    }, [props.visible, visible, form, props.data, spaceId]);
 
     const onSave = useCallback(async ()=>{
         const {errorFields=[]} = await form.validateFields()
@@ -58,10 +53,11 @@ const PageDetail:React.FC<PageDetailPropsType> = (props) => {
             return;
         }
         const {name, description, url, collection} = form.getFieldsValue();
-        const cacheData = await storage.get(storage.PAGEDATA) || {};
+        let pageData = await storage.get(storage.PAGEDATA, collection) || [];
+        let needUpdateNewId = '';
         if(data?.id){
             if(collection===collectionId){
-                cacheData[collectionId] = cacheData[collectionId].map(item=>{
+                pageData = pageData.map(item=>{
                     if(item.id===data.id){
                         item = {
                             ...item,
@@ -73,14 +69,20 @@ const PageDetail:React.FC<PageDetailPropsType> = (props) => {
                     return item;
                 })
             }else {
-                cacheData[collectionId] = cacheData[collectionId].filter(item=>item.id!==data.id)
-                cacheData[collectionId] = [...(cacheData?.[collectionId]||[]), {...data, name, description, url}]
+                pageData = [...pageData, {...data, name, description, url}]
+                needUpdateNewId = collection;
+                let newPageData = await storage.get(storage.PAGEDATA, collectionId) || [];
+                newPageData = newPageData.filter(item=>item.id!==data.id)
+                await storage.set([storage.PAGEDATA, collectionId], newPageData);
             }
 
         }else {
-            cacheData[collectionId] = [...(cacheData?.[collectionId]||[]), {id:uuidV4(), name, description, url}]
+            pageData = [...pageData, {id:uuidV4(), name, description, url}]
         }
-        await storage.set("PageData", cacheData);
+        await storage.set([storage.PAGEDATA, collection], pageData);
+        if(needUpdateNewId){
+            eventEmitter.emit("loadPage"+needUpdateNewId);
+        }
         props.onSave();
         onClose();
     },[collectionId, props.onSave])
@@ -103,8 +105,7 @@ const PageDetail:React.FC<PageDetailPropsType> = (props) => {
                     }
                 })
             }
-            const collections = await storage.get(storage.COLLECTIONDATA);
-            const currentCollections = collections[spaceId]||[];
+            const currentCollections = await storage.get(storage.COLLECTIONDATA, spaceId)||[];
             if(currentCollections.length){
                 replaceData(currentCollections)
                 setCollections(currentCollections)
@@ -128,7 +129,7 @@ const PageDetail:React.FC<PageDetailPropsType> = (props) => {
             onCancel={onClose}
         >
             <Form
-                name="basic"
+                name="PageDetail"
                 labelCol={{span: 6}}
                 wrapperCol={{span: 18}}
                 style={{maxWidth: 600}}
@@ -175,4 +176,4 @@ const PageDetail:React.FC<PageDetailPropsType> = (props) => {
         </Modal>
     )
 }
-export default PageDetail;
+export default inject("appStore")(observer(PageDetail));

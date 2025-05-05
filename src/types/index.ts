@@ -2,6 +2,7 @@ export interface AppStoreType{
     selectSpace: string[];
     setProperty:(params:anyParams)=>void;
     appTheme: 'light'|'night';
+    globalLoading: boolean;
 }
 
 export interface AppPropsType{

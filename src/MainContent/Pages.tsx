@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Card, Dropdown, Empty, Image, List, Modal, Tag} from "antd";
+import {Card, Dropdown, Image, List, Modal} from "antd";
 import {appPrefix} from "@/constants";
 import eventEmitter from "@/utils/eventEmitter.ts";
 import PageDetail from "@/MainContent/PageDetail.tsx";
@@ -22,9 +22,7 @@ const Pages: React.FC<PagesPropsType> = (props) => {
     const [{canDrop, isOver}, drop] = useDrop(() => ({
         accept: 'BOX',
         drop: async (item) => {
-            console.log("dropItem",item)
-            const cacheData = await storage.get(storage.PAGEDATA) || {};
-            const pageData = cacheData[collectionId] || [];
+            const pageData = await storage.get(storage.PAGEDATA, collectionId) || [];
             pageData.push({
                 id: uuidV4(),
                 name: item.title,
@@ -32,8 +30,7 @@ const Pages: React.FC<PagesPropsType> = (props) => {
                 url: item.url,
                 favIconUrl: item.favIconUrl
             })
-            cacheData[collectionId] = pageData;
-            await storage.set("PageData", cacheData);
+            await storage.set([storage.PAGEDATA, collectionId], pageData);
             setData(pageData)
         },
         collect: (monitor) => ({
@@ -42,8 +39,7 @@ const Pages: React.FC<PagesPropsType> = (props) => {
         }),
     }));
     const loadData = async () => {
-        const cacheData = await storage.get(storage.PAGEDATA) || {};
-        const pageData = cacheData[collectionId] || [];
+        const pageData = await storage.get(storage.PAGEDATA, collectionId) || [];
         setData(pageData)
         return pageData;
     }
@@ -59,6 +55,9 @@ const Pages: React.FC<PagesPropsType> = (props) => {
     useEffect(() => {
         eventEmitter.on("addPage" + collectionId, () => {
             onAddPage()
+        })
+        eventEmitter.on("loadPage" + collectionId, () => {
+            loadData()
         })
     }, [collectionId]);
 
@@ -82,10 +81,9 @@ const Pages: React.FC<PagesPropsType> = (props) => {
                     okText: '确认',
                     cancelText: '取消',
                     onOk: async () => {
-                        const cacheData = await storage.get(storage.PAGEDATA) || {};
-                        const pageData = cacheData[collectionId] || [];
-                        cacheData[collectionId] = pageData.filter(item1 => item1.id !== item.id)
-                        await storage.set("PageData", cacheData);
+                        let pageData = await storage.get(storage.PAGEDATA, collectionId) || [];
+                        pageData = pageData.filter(item1 => item1.id !== item.id)
+                        await storage.set([storage.PAGEDATA, collectionId], pageData);
                         await loadData()
                     }
                 })
@@ -99,7 +97,7 @@ const Pages: React.FC<PagesPropsType> = (props) => {
                     <div className={`${appPrefix}-main-page-title-icon`}>
                         <Image src={item.favIconUrl} style={{width: 20, height: 20}} fallback={"/favicon.ico"}/>
                     </div>
-                    <div className={`${appPrefix}-main-page-title-name`} title={item.name}>{item.name}</div>
+                    <div className={`${appPrefix}-main-page-title-name`} title={item.customTitle || item.name}>{item.customTitle || item.name}</div>
                 </div>}
                 onClick={onClickItem}
                 extra={<Dropdown menu={{
@@ -117,7 +115,7 @@ const Pages: React.FC<PagesPropsType> = (props) => {
                 }}><MoreOutlined/></Dropdown>}
             >
                 <div className={`${appPrefix}-main-page-item-description`}>
-                    {item.description}
+                    {item.customDescription || item.description || item.customTitle || item.name}
                 </div>
             </Card>
         )
