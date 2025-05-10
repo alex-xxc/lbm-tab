@@ -19,7 +19,10 @@ const Right:React.FC<RightPropsType> = () => {
             const windows = await chrome?.windows.getAll({ populate: true });
             setWindows(windows.map((item:any, index)=>{
                 item.content = `窗口${index+1}`
-                item.tabs = item.tabs.filter(item1=>item1.url.startsWith("http"))
+                item.tabs = item.tabs.filter(item1=>item1.url.startsWith("http")).map(item1=>{
+                    item1.name = item1.name||item1.title;
+                    return item1;
+                })
                 return item;
             }))
             return;

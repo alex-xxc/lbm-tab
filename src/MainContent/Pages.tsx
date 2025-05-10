@@ -66,7 +66,7 @@ const Pages: React.FC<PagesPropsType> = (props) => {
     }
     const renderItem = (item: any) => {
         const onClickItem = () => {
-            window.open(item.url)
+            window.location.href = item.url;
         }
         const onOperate = (data: any) => {
             data.domEvent.preventDefault();
